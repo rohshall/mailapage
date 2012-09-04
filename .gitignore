@@ -1,6 +1,8 @@
 pom.xml
+*swp
 *jar
 /lib/
+/target
 /target/classes/
 /target/stale/
 .lein-deps-sum

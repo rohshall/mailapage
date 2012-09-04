@@ -1,9 +1,10 @@
 (ns mailapage.models.user
-  (:require korma.core
-            [noir.util.crypt :as crypt]
+  (:require [noir.util.crypt :as crypt]
             [noir.validation :as vali]
-            [noir.session :as session]))
+            [noir.session :as session])
+  (:use     [korma.core]))
 
+(def bookmarks)
 ;; entity
 (defentity users
            (entity-fields :username :password)
@@ -12,11 +13,11 @@
 ;; Gets
 
 (defn all []
-  (select users)
+  (select* users))
 
-(defn get-username [username]
+(defn get-by-name [username]
   (select users
-    (where {:username username})))
+          (where {:username username})))
     
 (defn admin? []
   (session/get :admin))
@@ -24,17 +25,14 @@
 (defn me []
   (session/get :username))
 
-;; Mutations and Checks
+;; Validations
 
-(defn prepare [{password :password :as user}]
-  (assoc user :password (crypt/encrypt password)))
-
-(defn valid-user? [username]
-  (vali/rule (not (get-username username))
+(defn valid-username? [username]
+  (vali/rule (not (get-by-name username))
              [:username "That username is already taken"])
   (vali/rule (vali/min-length? username 3)
              [:username "Username must be at least 3 characters."])
-  (not (vali/errors? :username :password)))
+  (not (vali/errors? :username)))
 
 (defn valid-psw? [password]
   (vali/rule (vali/min-length? password 5)
@@ -48,22 +46,22 @@
           (values {:username username :password password})))
 
 (defn login! [{:keys [username password] :as user}]
-  (let [{stored-pass :password} (get-username username)]
+  (let [{stored-pass :password} (get-by-name username)]
     (if (and stored-pass 
              (crypt/compare password stored-pass))
       (do
-        (session/put! :admin true)
+        (when (= username "admin")
+          (session/put! :admin true))
         (session/put! :username username))
       (vali/set-error :username "Invalid username or password"))))
 
 (defn add! [{:keys [username password] :as user}]
-  (when (valid-user? username)
-    (when (valid-psw? password)
-      (-> user (prepare) (insert!)))))
+  (when (and (valid-username? username) (valid-psw? password))
+      (insert! user)))
 
 (defn remove! [username]
   (delete users
-          (where {:username [= username]})))
+          (where {:username username})))
 
 (defn init! []
-    (insert! (prepare {:username "admin" :password "admin"})))
+    (insert! {:username "admin" :password "admin"}))
