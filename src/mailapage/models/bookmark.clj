@@ -2,12 +2,14 @@
   (:require [mailapage.models.user :as user]
             [mailapage.models.book :as book]
             [noir.validation :as vali])
-  (:use     [korma.core]))
+  (:use     [korma.core]
+            [mailapage.models.common :only (mailapage-db)]))
 
 (defentity bookmarks
            (entity-fields :page)
            (belongs-to book/books)
-           (belongs-to user/users))
+           (belongs-to user/users)
+           (database mailapage-db))
 
 ;; Gets
 

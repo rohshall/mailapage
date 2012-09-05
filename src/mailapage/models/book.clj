@@ -1,13 +1,15 @@
 (ns mailapage.models.book
   (:require [noir.validation :as vali])
-  (:use     [korma.core])
+  (:use     [korma.core]
+            [mailapage.models.common :only (mailapage-db)])
   (:import  java.io.File))
 
 (def bookmarks)
 
 (defentity books
            (entity-fields :title :location)
-           (has-many bookmarks))
+           (has-many bookmarks)
+           (database mailapage-db))
 
 ;; Gets
 (defn all []

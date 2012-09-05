@@ -2,13 +2,16 @@
   (:require [noir.util.crypt :as crypt]
             [noir.validation :as vali]
             [noir.session :as session])
-  (:use     [korma.core]))
+  (:use     [korma.core]
+            [mailapage.models.common :only (mailapage-db)]))
 
 (def bookmarks)
+
 ;; entity
 (defentity users
            (entity-fields :username :password)
-           (has-many bookmarks))
+           (has-many bookmarks)
+           (database mailapage-db))
 
 ;; Gets
 
