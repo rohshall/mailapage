@@ -1,4 +1,4 @@
-(ns mailapage.app
+(ns mailapage.core
   (:gen-class))
 
 (defn -main [& args]

@@ -4,5 +4,4 @@
                            [org.apache.pdfbox/pdfbox "1.8.1"]
                            [org.clojure/java.jdbc "0.3.0-alpha4"]
                            [org.xerial/sqlite-jdbc "3.7.2"]]
-            :main mailapage.app)
-
+            :main mailapage.core)
