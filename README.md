@@ -1,7 +1,6 @@
 # mailapage
 
-Web application that helps users read a book by mailing them a page of a book a day.
-mailapage is written in noir - a Clojure web framework and Korma - Clojure SQL abstraction. 
+A daemon written in Clojure that helps users read a book by mailing them a page of a book a day.
 
 ## Usage
 
