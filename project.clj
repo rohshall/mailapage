@@ -3,5 +3,6 @@
             :dependencies [[org.clojure/clojure "1.5.1"]
                            [org.apache.pdfbox/pdfbox "1.8.1"]
                            [org.clojure/java.jdbc "0.3.0-alpha4"]
-                           [org.xerial/sqlite-jdbc "3.7.2"]]
+                           [org.xerial/sqlite-jdbc "3.7.15-SNAPSHOT"]
+                           [javax.mail/mail "1.5.0-b01"]]
             :main mailapage.core)

@@ -6,3 +6,11 @@ pom.xml
 /target/classes/
 /target/stale/
 .lein-deps-sum
+.lein-repl-history
+
+# intellij
+.idea
+*.iml
+
+# custom
+mailer.properties
