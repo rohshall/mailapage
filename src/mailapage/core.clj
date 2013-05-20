@@ -3,7 +3,7 @@
   (:require [clojure.java [jdbc :as sql]])
   (:import (java.io File StringWriter BufferedWriter FileInputStream)
            (java.util Properties)
-           (javax.mail Message MessagingException PasswordAuthentication Session Transport Authenticator)
+           (javax.mail Message$RecipientType MessagingException PasswordAuthentication Session Transport Authenticator)
            (javax.mail.internet InternetAddress MimeMessage)
            (org.apache.pdfbox.pdmodel PDDocument)
            (org.apache.pdfbox.util PDFTextStripper)))
@@ -31,8 +31,6 @@
                  (sql/with-query-results rs ["SELECT filename, page FROM bookmarks"]
                    (doall rs)))
         bookmark-seq (flatten (map #(vector (:filename %) (:page %)) output))]
-    (println output)
-    (println bookmark-seq)
     (if (empty? bookmark-seq)
       (hash-map)
       (apply hash-map bookmark-seq))))
@@ -80,7 +78,7 @@
                           page (get bookmarks file-name)]
                       (get-pdf-page file-path page)))
         pdf-pages (map pdf-pager pdf-files)]
-    (zipmap pdf-files pdf-pages)))
+    (zipmap (seq bookmarks) pdf-pages)))
 
 
 (defn send-mails [pdf-page-map]
@@ -88,15 +86,15 @@
                 (.load (FileInputStream. "mailer.properties")))
         authenticator (proxy [Authenticator] []
                         (getPasswordAuthentication [] (PasswordAuthentication. (.getProperty props "user.name") (.getProperty props "user.password"))))
-        session (.getInstance Session props authenticator)
+        session (Session/getInstance props authenticator)
         addr (InternetAddress. (.getProperty props "user.email"))]
-    (doseq [[filename contents] (seq pdf-page-map)]
+    (doseq [[[filename page] contents] (seq pdf-page-map)]
       (let [message (doto (MimeMessage. session)
                       (.setFrom addr)
-                      (.setRecipients Message/RecipientType/TO addr)
-                      (.setSubject (str filename ": Page "))
+                      (.setRecipient (Message$RecipientType/TO) addr)
+                      (.setSubject (str filename ": Page " page))
                       (.setText contents))]
-        (.send Transport message)))))
+        (Transport/send message)))))
 
 
 (defn -main [& args]
